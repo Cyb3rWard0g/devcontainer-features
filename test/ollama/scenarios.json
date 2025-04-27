@@ -1,0 +1,6 @@
+{
+    "ollama": {
+        "models": "phi:mini",
+        "withGPU": false
+    }
+}

@@ -1,0 +1,50 @@
+name: Validate Feature Manifests
+on:
+  pull_request:
+    paths: [ 'src/**/devcontainer-feature.json' ]
+  push:
+    branches: [ main ]
+    paths: [ 'src/**/devcontainer-feature.json' ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install jq
+        run: sudo apt-get update -y && sudo apt-get install -y jq
+
+      # 1) Schema + metadata lint
+      - name: devcontainers/action validate
+        uses: devcontainers/action@v1
+        with:
+          validate-only: "true"
+          base-path-to-features: "./src"
+
+      # 2) Verify each edited Feature bumps its semver
+      - name: Assert version increment
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          echo "▶ Checking version increments…"
+
+          # List changed feature manifests in the PR
+          MAPFILE -t files < <(git diff --name-only origin/${{ github.base_ref }} HEAD -- 'src/**/devcontainer-feature.json')
+          [[ ${#files[@]} -eq 0 ]] && { echo "No manifests changed."; exit 0; }
+
+          for file in "${files[@]}"; do
+            new=$(jq -r '.version' "$file")
+            old=$(git show "origin/${{ github.base_ref }}:$file" 2>/dev/null | jq -r '.version' || echo "0.0.0")
+
+            echo "  $file  →  $old  ➜  $new"
+            if [[ "$new" == "$old" ]]; then
+              echo "::error file=$file,line=1::Feature version not incremented (still $new)"
+              exit 1
+            fi
+          done
+
+          echo "✔ All modified Features have a new version."

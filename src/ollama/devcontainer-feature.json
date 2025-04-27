@@ -1,0 +1,26 @@
+{
+    "id": "ollama",
+    "version": "1.0.0",
+    "name": "Ollama (CPU / optional CUDA)",
+    "documentationURL": "https://github.com/cyb3rward0g/devcontainer-features/tree/main/src/ollama",
+    "licenseURL": "https://github.com/cyb3rward0g/devcontainer-features/blob/main/LICENSE",
+    "description": "Installs the Ollama runtime for local LLM inference and (optionally) pulls models.",
+    "options": {
+    "models": {
+        "type": "string",
+        "default": "",
+        "proposals": ["phi3-mini","gemma:2b","mistral:7b"],
+        "description": "Comma-separated list of models to pre-pull at build time (use \"none\" to skip)."
+    },
+    "withGPU": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA 12 libs and enable GPU acceleration (self-hosted runners only)."
+    }
+    },
+    "dependsOn": {
+      "common-utils": "ghcr.io/devcontainers/features/common-utils:2"
+    },
+    "entrypoint": "/usr/local/bin/ollama",
+    "installsAfter": []
+  }
