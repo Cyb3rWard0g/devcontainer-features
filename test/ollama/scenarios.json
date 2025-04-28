@@ -1,0 +1,11 @@
+{
+    "phi_mini_no_gpu": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "ollama": {
+                "models": "phi:2.7b"
+            }
+        },
+        "remoteUser": "vscode"
+    }
+}

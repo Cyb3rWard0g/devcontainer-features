@@ -1,0 +1,49 @@
+name: Release Dev-Container Features
+
+on:
+  push:
+    branches: [ main ]
+    tags:     [ 'v*' ]                 # publish when pushing v1.2.0 (optional)
+    paths:
+      - "src/**/*.sh"
+      - "src/**/devcontainer-feature.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────── validate ────────────────────────────
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Schema / metadata validation
+        uses: devcontainers/action@v1
+        with:
+          validate-only:      "true"
+          base-path-to-features: "./src"
+
+  # ─────────────────────────── publish  ────────────────────────────
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Publish features & auto-generate README.md
+        uses: devcontainers/action@v1
+        with:
+          publish-features:   "true"
+          base-path-to-features: "./src"
+          generate-docs:      "true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
