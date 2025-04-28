@@ -1,6 +1,6 @@
 {
     "id": "ollama",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "name": "Ollama (CPU / optional CUDA)",
     "documentationURL": "https://github.com/cyb3rward0g/devcontainer-features/tree/main/src/ollama",
     "licenseURL": "https://github.com/cyb3rward0g/devcontainer-features/blob/main/LICENSE",
